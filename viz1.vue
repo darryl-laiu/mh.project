@@ -7,18 +7,38 @@
       <div class="divider"/>
     </div>
     <highcharts v-if="displayed_chart" :options="chartOptions" class="chart"></highcharts>
+    <vue-slider 
+      ref="slider" 
+      v-model="demo.default.value" 
+      v-bind="demo.default"
+      @drag-start="updateChart()"
+      @drarg-end="updateChart()">
+    </vue-slider>
   </div>
 </template>
 
 
 <script>
 import { eventBus } from './main.js';
+import vueSlider from 'vue-slider-component'
 
 export default {
   name: 'viz1',
+  components: {
+    vueSlider
+  },
   data(){
     return{
       displayed: false,
+      demo: {
+        default: {
+          value: 1900,
+          min: 0,//this.chartOptions.series[0].data[0][0],
+          max: 100,//this.chartOptions.series[0].data[this.chartOptions.series[0].data.length - 1][0],
+          // data: [1901, 1902, 1903, 1904],
+          direction: 'horizontal'
+        }
+      },
       displayed_chart: false,
       displayed_map: false,
       word: null,
@@ -73,6 +93,12 @@ export default {
       if (this.displayed_map == true){
         this.displayed_map = false;
       }
+    },
+    updateChart: function(){
+      if (this.displayed_chart = true){
+        this.chartOptions.xAxis.min = this.demo.default.min;
+        this.chartOptions.xAxis.max = this.demo.default.value;
+      }
     }
   },
   mounted() {
@@ -93,6 +119,8 @@ export default {
         //console.log(this.chartOptions.series);
         //this.chartOptions.pointStart = server[0][0];
         //console.log(this.chartOptions.pointStart);
+        this.demo.default.min = this.chartOptions.series[0].data[0][0];
+        this.demo.default.max= this.chartOptions.series[0].data[this.chartOptions.series[0].data.length - 1][0];
     }),
     eventBus.$on('addData',(server) => {
         console.log(server);

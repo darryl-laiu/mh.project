@@ -15,6 +15,14 @@
                           placeholder="Search Word"
                           class="form-control col-sm-50"></b-form-input>
           </b-col>
+          <b-col sm="6">
+            <b-alert variant="danger"
+                         dismissible
+                         :show="showDismissibleAlert"
+                         @dismissed="showDismissibleAlert=false">
+                  Word does not exist. Try another word!
+                </b-alert>
+          </b-col>
           <hr id="divide"></hr>
           <b-col sm="6">
             <b-collapse id="collapse2">
@@ -42,8 +50,8 @@
 
 
 <script>
-import { eventBus } from './main.js';
-import mhl from './final.json';
+import { eventBus, database } from './main.js';
+import mhl from './data.json';
 
 export default {
   name: 'app',
@@ -52,51 +60,76 @@ export default {
       word: null,
       points: null,
       newSeries: null,
-      secondWord: null
+      secondWord: null,
+      showDismissibleAlert: false
     }
   },
   components: {
   },
   methods:{
-    getData: function(word) {
+    getData: async function(word) {
       // console.log(mhl)
-      let data = mhl;
-      let value = data[word];
+      // let data = mhl;
+      //let value;
 
-      let arrayPoints = [];
-      for(let key in value) {
-        let tmpArray = [];
-        tmpArray.push(Number(key));
-        tmpArray.push(value[key]);
-        arrayPoints.push(tmpArray);
+
+
+      let rootRef = database.ref("words/" + word)
+      let value = await rootRef.once("value")
+      if(!value.exists()) {
+        this.showDismissibleAlert = true;
+      } else {
+        //console.log(val);
+        let data = value.val()
+        //console.log(data);
+        // .then(function(snapshot) {
+        //   let value = snapshot.val();
+        //   console.log(value);
+        // })
+
+        let arrayPoints = [];
+        for(let key in data) {
+          let tmpArray = [];
+          tmpArray.push(Number(key));
+          tmpArray.push(data[key]);
+          arrayPoints.push(tmpArray);
+        }
+        //console.log(arrayPoints);
+        this.points = arrayPoints;
+        console.log(this.points);
+        eventBus.$emit('getData', this.points);
       }
-      console.log(arrayPoints);
-      this.points = arrayPoints;
-      //console.log(this.points);
-      eventBus.$emit('getData', this.points);
+      
     },
-    addData(word) {
-      let data = mhl;
-      let value = data[word];
+    addData: async function (word) {
+      // let data = mhl;
+      // let value = data[word];
 
-      let arrayPoints = [];
-      for(let key in value) {
-        let tmpArray = [];
-        console.log(key);
-        tmpArray.push(Number(key));
-        tmpArray.push(value[key]);
-        arrayPoints.push(tmpArray);
+      let rootRef = database.ref("words/" + word)
+      let value = await rootRef.once("value")
+      if(!value.exists()) {
+        this.showDismissibleAlert = true;
+      } else {
+
+        //console.log(val);
+        let data = value.val()
+
+        let arrayPoints = [];
+        for(let key in data) {
+          let tmpArray = [];
+          console.log(key);
+          tmpArray.push(Number(key));
+          tmpArray.push(data[key]);
+          arrayPoints.push(tmpArray);
+        }
+        this.newSeries = {
+            name: this.secondWord,
+            data: arrayPoints,
+            //color: '#ff0000'
+        };
+        //console.log(this.newSeries)
+        eventBus.$emit('addData', this.newSeries);
       }
-
-      this.newSeries = {
-          name: this.secondWord,
-          data: arrayPoints,
-          //color: '#ff0000'
-      };
-      //console.log(this.newSeries)
-      eventBus.$emit('addData', this.newSeries);
-      // this.$nextTick(function () {})
-      //Chart.render();
     },
     wordSearch: function(){
       let emit = this.word;

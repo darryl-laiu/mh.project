@@ -1,6 +1,6 @@
 <template>
   <div v-if="displayed" id="viz1" v-on:>
-    <h2 style="text-align:center;">Select Chart Type:</h2>
+    <h2 style="text-align:center;">Frequency of word across time: </h2>
     <hr>
     <div class="button-grp" style="text-align:center;">
       <!-- <b-button @click="chartclick()" variant="secondary">Chart</b-button> -->

@@ -9,6 +9,24 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Highcharts from 'highcharts'
 import stockInit from 'highcharts/modules/stock'
 
+import firebase from "firebase";
+
+
+
+// Initialize Firebase
+const config = {
+	apiKey: "AIzaSyAc5ckVrledPH5OGwpokZJRasJwLhyBg0c",
+	authDomain: "mhl-database.firebaseapp.com",
+	databaseURL: "https://mhl-database.firebaseio.com",
+	projectId: "mhl-database",
+	storageBucket: "mhl-database.appspot.com",
+	messagingSenderId: "757268950135"
+};
+firebase.initializeApp(config);
+
+export const database = firebase.database();
+
+Vue.use(database)
 
 stockInit(Highcharts)
 

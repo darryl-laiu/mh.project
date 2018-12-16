@@ -20,7 +20,7 @@
 
 <script>
 import { eventBus } from './main.js';
-import vueSlider from 'vue-slider-component'
+import vueSlider from './node_modules/vue-slider-component/src/vue2-slider.vue'
 
 export default {
   name: 'viz1',
